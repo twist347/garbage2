@@ -1,0 +1,86 @@
+$ ./wi.exe -f
+=================================================================
+==1832==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x127a35da5920 at pc 0x7ffc0e9a07c9 bp 0x00dcbe18ead0 sp 0x00dcbe18eb18
+READ of size 2209 at 0x127a35da5920 thread T0
+    #0 0x7ffc0e9a07c8 in strlen (C:\msys64\clang64\bin\libclang_rt.asan_dynamic-x86_64.dll+0x1800407c8)
+    #1 0x7ffc4ca90d93 in std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>::__assign_external(char const*) (C:\msys64\clang64\bin\libc++.dll+0x180050d93)
+    #2 0x7ff77c0ce089 in std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>::operator=[abi:ne200100](char const*) C:/msys64/clang64/include/c++/v1/string:1260:12
+    #3 0x7ff77c0ce089 in wi::core::security::wi_ssl_helper::generate_temporary_keys() C:/msys64/home/SelimkhanovEV/work/reliability/server/server/core/security/wi-ssl-helper.cpp:48:43
+    #4 0x7ff77cae39be in wi::core::security::wi_ssl_helper::wi_ssl_helper() C:/msys64/home/SelimkhanovEV/work/reliability/server/server/core/security/wi-ssl-helper.hpp:13:13
+    #5 0x7ff77cae39be in boost::serialization::detail::singleton_wrapper<wi::core::security::wi_ssl_helper>::singleton_wrapper() C:/msys64/boost_1_82_0/include/boost-1_82/boost/serialization/singleton.hpp:147:5
+    #6 0x7ff77c694d18 in boost::serialization::singleton<wi::core::security::wi_ssl_helper>::get_instance() C:/msys64/boost_1_82_0/include/boost-1_82/boost/serialization/singleton.hpp:171:47
+    #7 0x7ff77c694d18 in __cxx_global_var_init.42 C:/msys64/boost_1_82_0/include/boost-1_82/boost/serialization/singleton.hpp:207:36
+    #8 0x7ff77d8456ea in __do_global_ctors D:/W/B/src/mingw-w64/mingw-w64-crt/crt/gccmain.c:44:7
+    #9 0x7ff77d8456ea in __main D:/W/B/src/mingw-w64/mingw-w64-crt/crt/gccmain.c:58:7
+    #10 0x7ff77c041352 in __tmainCRTStartup D:/W/B/src/mingw-w64/mingw-w64-crt/crt/crtexe.c:219:2
+    #11 0x7ff77c0413b5 in .l_start D:/W/B/src/mingw-w64/mingw-w64-crt/crt/crtexe.c:122:9
+    #12 0x7ffc90e77033  (C:\Windows\System32\KERNEL32.DLL+0x180017033)
+    #13 0x7ffc913e26a0  (C:\Windows\SYSTEM32\ntdll.dll+0x1800526a0)
+
+0x127a35da5920 is located 0 bytes after 2208-byte region [0x127a35da5080,0x127a35da5920)
+allocated by thread T0 here:
+    #0 0x7ffc0e9aa3b1 in malloc (C:\msys64\clang64\bin\libclang_rt.asan_dynamic-x86_64.dll+0x18004a3b1)
+    #1 0x7ffc0f7c9e2c in CRYPTO_clear_realloc (C:\msys64\clang64\bin\libcrypto-3-x64.dll+0x180149e2c)
+    #2 0x7ffc0f6f556f in BUF_MEM_grow_clean (C:\msys64\clang64\bin\libcrypto-3-x64.dll+0x18007556f)
+    #3 0x7ffc0f6c9083 in BIO_new_mem_buf (C:\msys64\clang64\bin\libcrypto-3-x64.dll+0x180049083)
+    #4 0x7ffc0f6bf6ee in bwrite_conv (C:\msys64\clang64\bin\libcrypto-3-x64.dll+0x18003f6ee)
+    #5 0x7ffc0f6bdd5e in BIO_write (C:\msys64\clang64\bin\libcrypto-3-x64.dll+0x18003dd5e)
+    #6 0x7ffc0f6bde80 in BIO_write_ex (C:\msys64\clang64\bin\libcrypto-3-x64.dll+0x18003de80)
+    #7 0x7ffc0f6bdd5e in BIO_write (C:\msys64\clang64\bin\libcrypto-3-x64.dll+0x18003dd5e)
+    #8 0x7ffc0f6bdc25 in BIO_write (C:\msys64\clang64\bin\libcrypto-3-x64.dll+0x18003dc25)
+    #9 0x7ffc0f8ae835 in PEM_write_bio (C:\msys64\clang64\bin\libcrypto-3-x64.dll+0x18022e835)
+    #10 0x7ffc0f8addad in PEM_ASN1_write_bio (C:\msys64\clang64\bin\libcrypto-3-x64.dll+0x18022ddad)
+    #11 0x7ffc0f8adb32 in PEM_ASN1_write_bio (C:\msys64\clang64\bin\libcrypto-3-x64.dll+0x18022db32)
+    #12 0x7ffc0f8b00c1 in PEM_write_bio_PKCS8_PRIV_KEY_INFO (C:\msys64\clang64\bin\libcrypto-3-x64.dll+0x1802300c1)
+    #13 0x7ffc0f97bca3 in ossl_mac_key_up_ref (C:\msys64\clang64\bin\libcrypto-3-x64.dll+0x1802fbca3)
+    #14 0x7ffc0f97af99 in ossl_mac_key_up_ref (C:\msys64\clang64\bin\libcrypto-3-x64.dll+0x1802faf99)
+    #15 0x7ffc0f9692ea in ossl_mac_key_up_ref (C:\msys64\clang64\bin\libcrypto-3-x64.dll+0x1802e92ea)
+    #16 0x7ffc0f76d181 in OSSL_ENCODER_CTX_get_num_encoders (C:\msys64\clang64\bin\libcrypto-3-x64.dll+0x1800ed181)
+    #17 0x7ffc0f76cd3f in OSSL_ENCODER_to_bio (C:\msys64\clang64\bin\libcrypto-3-x64.dll+0x1800ecd3f)
+    #18 0x7ffc0f8b0a97 in PEM_write_bio_PrivateKey_ex (C:\msys64\clang64\bin\libcrypto-3-x64.dll+0x180230a97)
+    #19 0x7ffc0f8b0c33 in PEM_write_bio_PrivateKey (C:\msys64\clang64\bin\libcrypto-3-x64.dll+0x180230c33)
+    #20 0x7ff77c0cdfee in wi::core::security::wi_ssl_helper::generate_temporary_keys() C:/msys64/home/SelimkhanovEV/work/reliability/server/server/core/security/wi-ssl-helper.cpp:39:29
+    #21 0x7ff77cae39be in wi::core::security::wi_ssl_helper::wi_ssl_helper() C:/msys64/home/SelimkhanovEV/work/reliability/server/server/core/security/wi-ssl-helper.hpp:13:13
+    #22 0x7ff77cae39be in boost::serialization::detail::singleton_wrapper<wi::core::security::wi_ssl_helper>::singleton_wrapper() C:/msys64/boost_1_82_0/include/boost-1_82/boost/serialization/singleton.hpp:147:5
+    #23 0x7ff77c694d18 in boost::serialization::singleton<wi::core::security::wi_ssl_helper>::get_instance() C:/msys64/boost_1_82_0/include/boost-1_82/boost/serialization/singleton.hpp:171:47
+    #24 0x7ff77c694d18 in __cxx_global_var_init.42 C:/msys64/boost_1_82_0/include/boost-1_82/boost/serialization/singleton.hpp:207:36
+    #25 0x7ff77d8456ea in __do_global_ctors D:/W/B/src/mingw-w64/mingw-w64-crt/crt/gccmain.c:44:7
+    #26 0x7ff77d8456ea in __main D:/W/B/src/mingw-w64/mingw-w64-crt/crt/gccmain.c:58:7
+    #27 0x7ff77c041352 in __tmainCRTStartup D:/W/B/src/mingw-w64/mingw-w64-crt/crt/crtexe.c:219:2
+    #28 0x7ff77c0413b5 in .l_start D:/W/B/src/mingw-w64/mingw-w64-crt/crt/crtexe.c:122:9
+    #29 0x7ffc90e77033  (C:\Windows\System32\KERNEL32.DLL+0x180017033)
+    #30 0x7ffc913e26a0  (C:\Windows\SYSTEM32\ntdll.dll+0x1800526a0)
+
+SUMMARY: AddressSanitizer: heap-buffer-overflow (C:\msys64\clang64\bin\libc++.dll+0x180050d93) in std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>::__assign_external(char const*)
+Shadow bytes around the buggy address:
+  0x127a35da5680: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x127a35da5700: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x127a35da5780: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x127a35da5800: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x127a35da5880: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+=>0x127a35da5900: 00 00 00 00[fa]fa fa fa fa fa fa fa fa fa fa fa
+  0x127a35da5980: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x127a35da5a00: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x127a35da5a80: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x127a35da5b00: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x127a35da5b80: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07
+  Heap left redzone:       fa
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+  Left alloca redzone:     ca
+  Right alloca redzone:    cb
+==1832==ABORTING
