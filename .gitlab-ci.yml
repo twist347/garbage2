@@ -1,0 +1,130 @@
+# Available platform tags: debian10, win10, astra16, astra17
+
+variables:
+  # Check for the README.md on how to configure Boost for various platforms
+  BOOST_HOME: /home/gitlab-runner/boost_1_82_0
+  DOC_DIR: /var/www/rel_doc
+
+  # Use clang to compile the project
+  CLANG_C_COMPILER: /usr/bin/clang
+  CLANG_CXX_COMPILER: /usr/bin/clang++
+
+  BUILD_DIR: build
+  CPPCHACK_REPORT_DIR: cppcheck_report_$CI_COMMIT_SHORT_SHA
+
+stages:
+  - configure
+  - build
+  - test
+  # - deploy
+  - doc
+
+build-debian10-clang:
+  stage: build
+
+  tags:
+    - debian10
+
+  script:
+
+    # Check if build dir for current repository exists, create otherwise
+    - |
+      [ ! -d "$BUILD_DIR" ] && \
+        echo "Will create build dir $BUILD_DIR" && \
+        mkdir $BUILD_DIR
+    - cd $BUILD_DIR
+
+    # Make
+    - |
+      cmake -S .. -B . \
+        -G Ninja \
+        -DCMAKE_C_COMPILER=$CLANG_C_COMPILER \
+        -DCMAKE_CXX_COMPILER=$CLANG_CXX_COMPILER \
+        -DBoost_NO_SYSTEM_PATHS=TRUE \
+        -DBoost_ROOT=$BOOST_HOME
+
+    # Build
+    - cmake --build .
+
+build-debian10-gcc:
+  stage: build
+
+  tags:
+    - debian10
+
+  script:
+
+    # Check if build dir for current repository exists, create otherwise
+    - |
+      [ ! -d "$BUILD_DIR" ] && \
+        echo "Will create build dir $BUILD_DIR" && \
+        mkdir $BUILD_DIR
+    - cd $BUILD_DIR
+
+    # Make
+    - |
+      cmake -S .. -B . \
+        -G Ninja \
+        -DBoost_NO_SYSTEM_PATHS=TRUE \
+        -DBoost_ROOT=$BOOST_HOME
+
+    # Build
+    - cmake --build . -- -j4 2>&1 | tee >(grep hana > hana.log) | grep -v hana
+
+build-debian10-cppcheck:
+  stage: test
+  tags:
+    - debian10
+  needs:
+    - job: build-debian10-clang
+  script:
+    - export TARGET_BRANCH="origin/develop"
+    - export CHANGED_FILES=$(git fetch origin main > /dev/null 2>&1 && git diff --name-only $TARGET_BRANCH...HEAD | grep -E '\.(cpp|hpp|cc|cxx|h)$' || true)
+    - |
+     if [ -z "$CHANGED_FILES" ]; then
+         echo "No C++ source/header files changed in MR.";
+         exit 0;
+     else
+         echo "Running cppcheck on: $CHANGED_FILES"
+         /opt/cppcheck/2.17.0/bin/cppcheck -Iserver/include --enable=all --inline-suppr --std=c++17 --xml --suppress=missingIncludeSystem --suppress=missingInclude $CHANGED_FILES 2> cppcheck.xml
+         cppcheck-htmlreport --file=cppcheck.xml --report-dir=$CPPCHACK_REPORT_DIR --source-dir=$(pwd)
+     fi
+  artifacts:
+    name: "${CPPCHACK_REPORT_DIR}"
+    paths:
+     - $CPPCHACK_REPORT_DIR
+    expire_in: 3 hours
+
+build-doc:
+  stage: doc
+
+  tags:
+    - debian10
+
+  only:
+    - develop
+    - /doc_build\/.*/
+    - /documentation\/.*/
+    - /documenting\/.*/
+    - /(.*\/)?cicd(\/.*)?/
+
+  script:
+    - |
+      [ ! -d "$BUILD_DIR" ] && \
+        echo "Will create build dir $BUILD_DIR" && \
+        mkdir $BUILD_DIR
+    - cd $BUILD_DIR
+
+    # Make
+    - |
+      cmake -S .. -B . \
+        -G Ninja \
+        -DCMAKE_C_COMPILER=$CLANG_C_COMPILER \
+        -DCMAKE_CXX_COMPILER=$CLANG_CXX_COMPILER \
+        -DBoost_NO_SYSTEM_PATHS=TRUE \
+        -DBoost_ROOT=$BOOST_HOME
+    - cmake --build . --target wi-docs
+    - cd ..
+    - rm -rf $DOC_DIR/*
+    - cp -r ./server/documentation/wi/html/* $DOC_DIR/
+
